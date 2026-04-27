@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, ExternalLink, Map, Globe, Info, Image as ImageIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ExternalLink, Globe, Info, Image as ImageIcon } from 'lucide-react';
 
 const Presentation = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -26,7 +26,7 @@ const Presentation = () => {
         "Control mattered more than communities."
       ],
       type: "content",
-      icon: <Info className="w-12 h-12 text-blue-400" />
+      image: "https://images.unsplash.com/photo-1521295121812-af4657139139?auto=format&fit=crop&q=80&w=800"
     },
     {
       title: "Palestine Conflict",
@@ -50,7 +50,7 @@ const Presentation = () => {
         "15 million displaced; millions killed."
       ],
       type: "content",
-      image: "https://upload.wikimedia.org/wikipedia/commons/a/af/Partition_of_India-en.svg"
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Partition_of_India-en.svg/800px-Partition_of_India-en.svg.png"
     },
     {
       title: "India & China",
@@ -84,7 +84,7 @@ const Presentation = () => {
 
   return (
     <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-4 font-sans">
-      <div className="w-full max-w-6xl bg-slate-800 rounded-2xl shadow-2xl overflow-hidden border border-slate-700 flex flex-col relative" style={{ minHeight: '600px' }}>
+      <div className="w-full max-w-6xl bg-slate-800 rounded-2xl shadow-2xl overflow-hidden border border-slate-700 flex flex-col relative" style={{ minHeight: '650px' }}>
         
         {/* Progress Bar */}
         <div className="absolute top-0 left-0 w-full h-1 bg-slate-700 z-10">
@@ -121,26 +121,26 @@ const Presentation = () => {
             </div>
 
             {slides[currentSlide].secondaryLink && (
-                <div className="mt-8">
-                    <a 
-                    href={slides[currentSlide].secondaryLink} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 font-semibold transition-colors"
-                    >
-                    <Globe size={18} /> View Harvard Murdock Map
-                    </a>
-                </div>
+              <div className="mt-8">
+                <a 
+                  href={slides[currentSlide].secondaryLink} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-lg font-semibold transition-all transform hover:scale-105"
+                >
+                  <Globe size={18} /> View Harvard Murdock Map
+                </a>
+              </div>
             )}
           </div>
 
           {/* Image Area */}
           {slides[currentSlide].image && (
-            <div className="md:w-1/2 bg-slate-900 flex items-center justify-center p-4 relative group">
+            <div className="md:w-1/2 bg-slate-900 flex items-center justify-center p-6 relative group border-l border-slate-700">
               <img 
                 src={slides[currentSlide].image} 
                 alt={slides[currentSlide].title}
-                className="max-h-full max-w-full object-contain rounded shadow-lg border border-slate-700"
+                className="max-h-full max-w-full object-contain rounded-lg shadow-2xl border border-slate-700/50"
                 onError={(e) => {
                   e.target.style.display = 'none';
                   e.target.nextSibling.style.display = 'flex';
@@ -151,29 +151,31 @@ const Presentation = () => {
                 <p className="text-sm">Image preview blocked or link expired.</p>
                 <a href={slides[currentSlide].image} target="_blank" className="text-blue-400 underline mt-2 text-xs">Open Original Link</a>
               </div>
-              <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 p-2 rounded text-[10px] text-white">
-                Source: Historical Archive
+              <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-60 transition-opacity bg-black px-2 py-1 rounded text-[10px] text-white">
+                Map/Asset Source
               </div>
             </div>
           )}
         </div>
 
         {/* Navigation Buttons */}
-        <div className="flex justify-between items-center p-4 bg-slate-850 border-t border-slate-700 z-10">
+        <div className="flex justify-between items-center p-4 bg-slate-800 border-t border-slate-700 z-10 shadow-inner">
           <button 
             onClick={prevSlide}
-            className="p-2 rounded-full hover:bg-slate-700 transition-colors"
+            className="p-3 rounded-full hover:bg-slate-700 text-white transition-all active:scale-90"
+            aria-label="Previous Slide"
           >
             <ChevronLeft size={28} />
           </button>
           
-          <div className="text-slate-500 text-xs font-mono uppercase tracking-widest">
+          <div className="text-slate-400 text-xs font-mono uppercase tracking-[0.2em] hidden sm:block">
             {slides[currentSlide].title}
           </div>
 
           <button 
             onClick={nextSlide}
-            className="p-2 rounded-full hover:bg-slate-700 transition-colors"
+            className="p-3 rounded-full hover:bg-slate-700 text-white transition-all active:scale-90"
+            aria-label="Next Slide"
           >
             <ChevronRight size={28} />
           </button>
@@ -181,8 +183,8 @@ const Presentation = () => {
       </div>
 
       {/* Footer */}
-      <div className="mt-6 text-slate-500 text-xs flex items-center gap-2">
-        <ExternalLink size={12} /> Images loaded via external CDN/Wiki. Interactive Map Presentation.
+      <div className="mt-6 text-slate-500 text-[10px] flex items-center gap-2 uppercase tracking-widest opacity-60">
+        <ExternalLink size={10} /> Live Data & Historical Map Integration
       </div>
     </div>
   );

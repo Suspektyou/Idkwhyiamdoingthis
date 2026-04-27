@@ -11,6 +11,287 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<body class="bg-slate-900 m-0 p-0 overflow-hidden">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useRef, useEffect } = React;
+
+        const Presentation = () => {
+            const[currentSlide, setCurrentSlide] = useState(0);
+            const [isFullscreen, setIsFullscreen] = useState(false);
+            const containerRef = useRef(null);
+
+            // DIRECT, RELIABLE IMAGE LINKS
+            const slides =[
+                // 1. NEW INTRO SLIDE (Only Text)
+                {
+                    title: "British Border Drawing & Colonial Mapmaking",
+                    subtitle: "The Historical Legacy of Imperial Boundaries",
+                    content: [],
+                    type: "intro",
+                    image: null // Removed image for the first page
+                },
+                // 2. OVERVIEW SLIDE
+                {
+                    title: "Presentation Overview",
+                    subtitle: "Case Studies in Historical Mapmaking",
+                    content:[
+                        "1. Administrative Frameworks: The logic of mapmaking.",
+                        "2. The Middle East: The British Mandate period.",
+                        "3. South Asia: The 1947 Radcliffe Line.",
+                        "4. The Himalayan Divide: Sino-Indian borders.",
+                        "5. Sub-Saharan Africa: Post-Berlin Conference boundaries."
+                    ],
+                    type: "overview",
+                    image: "https://images.unsplash.com/photo-1521295121812-af4657139139?auto=format&fit=crop&q=80&w=800"
+                },
+                // 3. ADMINISTRATIVE
+                {
+                    title: "Administrative Frameworks",
+                    subtitle: "The Logic of Imperial Mapmaking",
+                    content:[
+                        "Boundaries were often drawn far from the affected regions.",
+                        "Administrative efficiency frequently prioritized over local demographics.",
+                        "Diverse ethnic and linguistic groups were consolidated into single territories.",
+                        "Historical trade routes and nomadic patterns were often disrupted."
+                    ],
+                    type: "content",
+                    image: "https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?auto=format&fit=crop&q=80&w=800"
+                },
+                // 4. MIDDLE EAST
+                {
+                    title: "The Middle East",
+                    subtitle: "The British Mandate Period",
+                    content:[
+                        "British Mandate for Palestine (1920–1948).",
+                        "Overlapping territorial promises to different national movements.",
+                        "Complex interplay of historical claims and new administrative lines.",
+                        "Contributed to long-standing regional disputes still active today."
+                    ],
+                    type: "content",
+                    image: "https://upload.wikimedia.org/wikipedia/commons/b/bd/BritishMandatePalestine1920.png"
+                },
+                // 5. SOUTH ASIA
+                {
+                    title: "South Asia",
+                    subtitle: "The Radcliffe Line (1947)",
+                    content:[
+                        "Partition of British India into India and Pakistan.",
+                        "Borders drawn by the Radcliffe Boundary Commission in a compressed timeframe.",
+                        "Divided the culturally integrated provinces of Punjab and Bengal.",
+                        "Resulted in massive displacement (approx. 15 million) and significant casualties."
+                    ],
+                    type: "content",
+                    image: "https://upload.wikimedia.org/wikipedia/commons/a/af/Partition_of_India-en.svg"
+                },
+                // 6. HIMALAYAS
+                {
+                    title: "The Himalayan Divide",
+                    subtitle: "Sino-Indian Border Disputes",
+                    content:[
+                        "The McMahon Line proposed at the 1914 Simla Convention.",
+                        "Relied on vague geographical markers in difficult, high-altitude terrain.",
+                        "Never formally recognized by all parties involved.",
+                        "Has led to periodic military standoffs and border conflicts."
+                    ],
+                    type: "content",
+                    image: "https://upload.wikimedia.org/wikipedia/commons/c/c5/McMahon_Line.png"
+                },
+                // 7. AFRICA
+                {
+                    title: "Sub-Saharan Africa",
+                    subtitle: "Post-Berlin Conference Boundaries",
+                    content:[
+                        "1884 Berlin Conference formalized European territorial claims.",
+                        "Resulting borders frequently bisected existing cultural and linguistic groups.",
+                        "Grouped historically distinct societies into single nation-states.",
+                        "Ongoing tension between inherited colonial maps and local realities."
+                    ],
+                    type: "content",
+                    image: "https://upload.wikimedia.org/wikipedia/commons/5/52/Africa_ethnic_groups_1996.jpg",
+                    secondaryLink: "https://worldmap.harvard.edu/data/geonode:murdock_ea_30"
+                }
+            ];
+
+            const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
+            const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+
+            // Fullscreen Toggle Logic
+            const toggleFullscreen = () => {
+                const elem = containerRef.current;
+                if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                    if (elem.requestFullscreen) elem.requestFullscreen();
+                    else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen(); // Safari/iPad fallback
+                    setIsFullscreen(true);
+                } else {
+                    if (document.exitFullscreen) document.exitFullscreen();
+                    else if (document.webkitExitFullscreen) document.webkitExitFullscreen(); // Safari/iPad fallback
+                    setIsFullscreen(false);
+                }
+            };
+
+            // Detect if user exits fullscreen with the escape key
+            useEffect(() => {
+                const handleFullscreenChange = () => {
+                    setIsFullscreen(!!(document.fullscreenElement || document.webkitFullscreenElement));
+                };
+                document.addEventListener('fullscreenchange', handleFullscreenChange);
+                document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+                return () => {
+                    document.removeEventListener('fullscreenchange', handleFullscreenChange);
+                    document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+                };
+            },[]);
+
+            return (
+                <div 
+                    ref={containerRef} 
+                    className="min-h-screen w-full bg-slate-900 text-white flex flex-col items-center justify-center p-4 md:p-8 font-sans transition-all duration-500"
+                >
+                    {/* Main Presentation Card */}
+                    <div 
+                        className={`w-full max-w-7xl bg-slate-800 rounded-2xl shadow-2xl overflow-hidden border border-slate-700 flex flex-col relative cursor-pointer ${isFullscreen ? 'h-[90vh]' : 'h-[80vh] min-h-[600px]'}`} 
+                        onClick={nextSlide} // Tap anywhere to advance slide
+                    >
+                        
+                        {/* Progress Bar */}
+                        <div className="absolute top-0 left-0 w-full h-1.5 bg-slate-700 z-10">
+                            <div 
+                                className="h-full bg-blue-500 transition-all duration-300" 
+                                style={{ width: `${((currentSlide + 1) / slides.length) * 100}%` }}
+                            />
+                        </div>
+
+                        {/* Slide Layout Container */}
+                        <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative group">
+                            
+                            {/* Tap Indicator (Fades out when hovered) */}
+                            <div className="absolute top-4 right-4 text-slate-500 text-xs font-semibold bg-slate-900/50 px-3 py-1.5 rounded-full opacity-0 md:group-hover:opacity-100 transition-opacity z-20 hidden md:block pointer-events-none">
+                                Tap anywhere to advance 
+                            </div>
+                            
+                            {/* Text Content Area */}
+                            <div className={`flex-1 flex flex-col justify-center p-8 lg:p-14 ${slides[currentSlide].image ? 'md:w-1/2' : 'w-full items-center text-center'}`}>
+                                
+                                {slides[currentSlide].type !== 'intro' && (
+                                    <div className="mb-4 opacity-80 uppercase tracking-widest text-xs font-bold text-blue-400">
+                                        Slide {currentSlide + 1} of {slides.length}
+                                    </div>
+                                )}
+                                
+                                <h1 className={`${slides[currentSlide].type === 'intro' ? 'text-5xl lg:text-7xl text-blue-100 max-w-4xl' : 'text-4xl lg:text-5xl'} font-black mb-4 tracking-tight leading-tight`}>
+                                    {slides[currentSlide].title}
+                                </h1>
+                                
+                                <h2 className={`${slides[currentSlide].type === 'intro' ? 'text-2xl mt-4 text-blue-300/80' : 'text-xl text-slate-400'} font-medium italic mb-8`}>
+                                    {slides[currentSlide].subtitle}
+                                </h2>
+
+                                {slides[currentSlide].content.length > 0 && (
+                                    <div className={`space-y-5 ${!slides[currentSlide].image ? 'max-w-2xl mx-auto' : ''}`}>
+                                        {slides[currentSlide].content.map((text, idx) => (
+                                            <div key={idx} className={`flex items-start space-x-4 text-lg lg:text-2xl font-light ${!slides[currentSlide].image ? 'justify-center text-center' : ''}`}>
+                                                <span className="h-2 w-2 bg-blue-500 rounded-full flex-shrink-0 mt-3" />
+                                                <p className="leading-relaxed">{text}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {slides[currentSlide].secondaryLink && (
+                                    <div className="mt-10">
+                                        <a 
+                                            href={slides[currentSlide].secondaryLink} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            onClick={(e) => e.stopPropagation()} // Prevents tapping link from advancing slide
+                                            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-semibold transition-all transform hover:scale-105 shadow-lg"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                                            View Historical Database Map
+                                        </a>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Image Area */}
+                            {slides[currentSlide].image && (
+                                <div className="md:w-1/2 bg-slate-900/50 flex items-center justify-center p-8 relative border-l border-slate-700">
+                                    <img 
+                                        src={slides[currentSlide].image} 
+                                        alt={slides[currentSlide].title}
+                                        className="max-h-full max-w-full object-contain rounded-lg shadow-2xl border border-slate-600/30"
+                                        onError={(e) => {
+                                            e.target.style.display = 'none';
+                                            e.target.nextSibling.style.display = 'flex';
+                                        }}
+                                    />
+                                    <div className="hidden absolute inset-0 flex-col items-center justify-center text-slate-500 bg-slate-900 p-8 text-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mb-4 opacity-20"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                                        <p className="text-sm">Map preview could not load.</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Navigation Footer */}
+                        <div className="flex justify-between items-center p-4 lg:p-6 bg-slate-800 border-t border-slate-700 z-10 shadow-inner">
+                            
+                            {/* Presentation Mode Button */}
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); toggleFullscreen(); }}
+                                className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors bg-slate-700/50 hover:bg-slate-700 px-4 py-2 rounded-lg text-sm font-medium"
+                                aria-label="Toggle Fullscreen"
+                            >
+                                {isFullscreen ? (
+                                    <><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg> Exit Fullscreen</>
+                                ) : (
+                                    <><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg> Presentation Mode</>
+                                )}
+                            </button>
+
+                            {/* Manual Controls */}
+                            <div className="flex gap-4">
+                                <button 
+                                    onClick={(e) => { e.stopPropagation(); prevSlide(); }}
+                                    className="p-3 bg-slate-700 rounded-full hover:bg-blue-600 text-white transition-all active:scale-90 shadow-md"
+                                    aria-label="Previous Slide"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                                </button>
+
+                                <button 
+                                    onClick={(e) => { e.stopPropagation(); nextSlide(); }}
+                                    className="p-3 bg-slate-700 rounded-full hover:bg-blue-600 text-white transition-all active:scale-90 shadow-md"
+                                    aria-label="Next Slide"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<Presentation />);
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historical Borders Presentation</title>
+    
+    <!-- Load React, ReactDOM, Babel, and Tailwind CSS -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
 <body class="bg-slate-900">
     <div id="root"></div>
 
